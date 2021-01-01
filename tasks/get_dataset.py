@@ -1,13 +1,28 @@
+import argparse
 import sys
-import pathlib
 
 ROOT_DIR = pathlib.Path(__file__).absolute().parents[1]
 sys.path.append(str(ROOT_DIR))
 
-from src.dataset.download import Downloader
+from src import Downloader
 
 if __name__ == '__main__':
-    data_dir = ROOT_DIR / 'data' / 'raw'
-    pmc = Downloader(data_dir)
-    for fold in pmc.list_folder('00/'):
-        pmc.download_folder(fold)
+    parser = argparse.ArgumentParser(description='PMCaption downloader')
+    parser.add_argument('data_dir', type=str, help='image target directory')
+    parser.add_argument('metadata', type=str, help='metadata file path')
+    parser.add_argument(
+        'num_samples',
+        type=int,
+        help='number of samples to download',
+        default=None
+    )
+
+    args = parser.parse_args()
+
+    dl_manager = Downloader(
+        args.data_dir,
+        args.metadata,
+        args.num_samples
+    )
+
+    dl_manager.download_and_extract()
